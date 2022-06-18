@@ -18,6 +18,30 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+    # Dependency list: build/Dockerfile-debian
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y --no-install-recommends \
+        libasound2-dev \
+        ffmpeg \
+        libavutil-dev \
+        libclang-dev \
+        libkrb5-dev \
+        libx264-dev \
+        libx264-dev \
+        libxcb-render0-dev \
+        libxcb-shape0-dev \
+        libxcb-xfixes0-dev \
+        libxdamage-dev \
+        libxext-dev \
+        x264 \
+        xcb \
+        libavformat-dev \
+        libavfilter-dev \
+        libavdevice-dev \
+        dpkg-dev \
+        libpam0g-dev \
+        libdbus-1-dev
     - name: Build
       env:
         RUSTFLAGS: -D warnings
@@ -27,3 +51,50 @@ jobs:
         args: --release --all --verbose --all-features
     - name: Run tests
       run: cargo test --all --release --verbose --all-features
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt
+      - name: Check format
+        run: cargo fmt --all -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
+      # Dependency list: build/Dockerfile-debian
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+          libasound2-dev \
+          ffmpeg \
+          libavutil-dev \
+          libclang-dev \
+          libkrb5-dev \
+          libx264-dev \
+          libx264-dev \
+          libxcb-render0-dev \
+          libxcb-shape0-dev \
+          libxcb-xfixes0-dev \
+          libxdamage-dev \
+          libxext-dev \
+          x264 \
+          xcb \
+          libavformat-dev \
+          libavfilter-dev \
+          libavdevice-dev \
+          dpkg-dev \
+          libpam0g-dev \
+          libdbus-1-dev
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
